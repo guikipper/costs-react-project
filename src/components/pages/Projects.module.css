@@ -1,0 +1,15 @@
+.project_container {
+    padding: 2em;
+}
+.title_container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5em;
+}
+.max_height {
+    max-height: 600px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border: 1px solid #b1abab;
+    padding: 1em;
+}
