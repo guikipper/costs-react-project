@@ -10,7 +10,7 @@ function ProjectForm({ handleSubmit, btnText, projectData }) {
   const [project, setProject] = useState(projectData || {});
 
   useEffect(() => { //função para popular o Select com as categorias
-    fetch("http://localhost:5000/categories", {
+    fetch("http://localhost:4000/categories", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -18,6 +18,7 @@ function ProjectForm({ handleSubmit, btnText, projectData }) {
     })
       .then((resp) => resp.json())
       .then((data) => {
+        console.log('Dados em categories', data)
         setCategories(data); //busca os dados na API e atribui em categories
       })
       .catch((err) => {
@@ -27,8 +28,7 @@ function ProjectForm({ handleSubmit, btnText, projectData }) {
 
   const submit = (e) => {
     e.preventDefault();
-    handleSubmit(project) //aqui é o método passado pela prop, q pede o project como argumento, está sendo passado daqui
-    console.log('Tentando achar o cost:',project)
+    handleSubmit(project) //aqui é o método passado pela prop, que pede o project como argumento, está sendo passado daqui
   };
 
   function handleChange(e) {

@@ -7,22 +7,29 @@ function NewProject() {
     const navigate = useNavigate()
 
     function createPost(project) {
-        //initialize cost and services
-        project.cost = 0; //nao entendi
-        project.services = [] //nao entendi
 
-        fetch("http://localhost:5000/projects", 
-            { 
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(project)
-            })
-            .then((res) => res.json())
-            .then((data)=> {
-                console.log('Testando o PROJECT antes do POST: ',project)
-                navigate("/projects", { state: "Projeto criado com sucesso!" })
-            })
-            .catch((err)=>console.log(err))
+        console.log(project)
+        if(project.name && project.budget && project.category) {
+                //initialize cost and services
+            project.cost = 0; //nao entendi
+            project.services = [] //nao entendi
+
+            fetch("http://localhost:4000/projects", 
+                { 
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(project)
+                })
+                .then((res) => res.json())
+                .then((data)=> {
+                    navigate("/projects", { state: "Projeto criado com sucesso!" })
+                })
+                .catch((err)=>console.log(err))
+        } else {
+            console.log('ta moscando parça tem q preencher tudo')
+        }
+
+       
     }
 
     return (

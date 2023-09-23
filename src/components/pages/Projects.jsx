@@ -19,7 +19,7 @@ function Projects() {
     } 
 
     useEffect(() =>{
-        fetch("http://localhost:5000/projects",{
+        fetch("http://localhost:4000/projects",{
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -30,14 +30,15 @@ function Projects() {
             
             setProjects(data)
             setRemoveLoading(true)
+
         })
         .catch((err)=>{
             console.log(err)
         })
     }, [])
-   
+
     function removeProject(id) {
-        fetch(`http://localhost:5000/projects/${id}`,{
+        fetch(`http://localhost:4000/projects/${id}`,{
             method: 'DELETE',
             headers: {
                 'Content-Type':'application/json'
@@ -46,9 +47,7 @@ function Projects() {
         .then((resp)=> resp.json())
         .then((data)=> {
             setProjects(projects.filter((project)=>{
-                return project.id !== id
-                
-                
+                return project._id !== id
             }))
         })
         .catch((err)=> {console.log('Error: ',err)})
@@ -61,16 +60,16 @@ function Projects() {
                 <LinkButton to="/newproject" text="Criar Projeto"/>
             </div>
             {message && (
-                <Message msg={message} type="sucess"/>
+                <Message msg={message} type="success"/>
             )}
             {projectMessage && (
-                <Message msg={projectMessage} type="sucess"/>
+                <Message msg={projectMessage} type="success"/>
             )}
             <div className={styles.max_height}>
-                <Container customClass="start">
+              {  <Container customClass="start">
                     {projects.length > 0 && ( 
                         projects.map((project)=>(
-                            <ProjectCard id={project.id} name={project.name} budget={project.budget} category={project.category.name} key={project.key} handleRemove={removeProject}/> //esse cara recebe 6 parâmetros
+                            <ProjectCard id={project._id} name={project.name} budget={project.budget} category={project.category.name} key={project.key} handleRemove={removeProject}/> //esse cara recebe 6 parâmetros
                         )))
                     }
                     {!removeLoading && ( //se removeLoading for false, irá aparecer o loading
@@ -79,7 +78,7 @@ function Projects() {
                     {removeLoading && projects.length === 0 && (
                         <p>Não há projetos cadastrados.</p>
                     )}
-                </Container>
+                </Container>}
             </div>
             
         </div>

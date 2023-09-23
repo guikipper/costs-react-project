@@ -19,9 +19,9 @@ function Project() {
     const [showServiceForm, setShowServiceForm] = useState(false)
     const [services, setServices] = useState([])
 
-    useEffect(() => {
+    useEffect(() => { 
         setTimeout(() => {
-            fetch(`http://localhost:5000/projects/${id}`, {
+            fetch(`http://localhost:4000/projects/${id}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -40,7 +40,7 @@ function Project() {
 
     //Divisão
 
-    function editPost (project) {
+    function editProject (project) {
         setMessage('')
          if (project.budget < project.cost) {
             setMessage('O orçamento não pode ser menor que o custo do projeto.')
@@ -48,7 +48,7 @@ function Project() {
             return false
         } 
 
-        fetch(`http://localhost:5000/projects/${project.id}`,{
+        fetch(`http://localhost:4000/projects/${project._id}`,{
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'
@@ -59,7 +59,7 @@ function Project() {
         .then((data)=>{
             setMessage('Projeto atualizado.')
             setType('success')
-            setProject(data)
+            setProject(project)
             setShowProjectForm(false)
         })
         .catch((err)=>{
@@ -70,8 +70,6 @@ function Project() {
     function createService(project) {
         setMessage('')
         const lastService = project.services[project.services.length -1]
-        
-        console.log('projeto inteiro', project)
         lastService.id = uuid()
         const lastServiceCost = parseFloat(lastService.cost) //certo
         const newCost = parseFloat(project.cost) + lastServiceCost
@@ -91,7 +89,7 @@ function Project() {
 
         // update project
 
-        fetch(`http://localhost:5000/projects/${project.id}`,{
+        fetch(`http://localhost:4000/projects/${project.id}`,{
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'
@@ -101,15 +99,13 @@ function Project() {
         .then((res)=>res.json())
         .then((data)=>{
             setShowServiceForm(false)
-            console.log(data)
         })
         .catch((err)=>{
             console.log('Error: ',err)
         })
-
     }
 
-    function toggleProjectForm() {
+    function toggleProjectForm() { //função para exibir ou não a edição do projeto
         setShowProjectForm(!showProjectForm)
     }
     function toggleServiceForm() {
@@ -133,7 +129,6 @@ function Project() {
         })
         .then((res)=>res.json())
         .then((data)=>{
-            console.log('Segue o serviço atualizado!', data)
             setProject(projectUpdated)
             setServices(serviceUpdate)
             setMessage('Serviço removido com sucesso!')
@@ -141,10 +136,9 @@ function Project() {
         .catch()
     }
 
-    console.log('OS DOIS AÍ: ',message, type)
     return (
-    <>
-    {project.name ? (
+        <>
+        {project.name ? (
         <div className={styles.project_details}>
             <Container customClass="column">
                 {message && (
@@ -156,6 +150,9 @@ function Project() {
                     {!showProjectForm ? (
                         <div className={styles.project_info}>
                             <p>
+                                <span>Nome:</span> {project.name}
+                            </p>
+                            <p>
                                 <span>Categoria:</span> {project.category.name}
                             </p>
                             <p>
@@ -165,9 +162,11 @@ function Project() {
                                 <span>Total Utilizado:</span> R$ {project.cost}
                             </p>
                         </div>
-                    ) : (
+                    )
+                    : //se não 
+                    (
                         <div className={styles.project_info}>
-                            <ProjectForm handleSubmit={editPost} btnText="Concluir Edição" projectData={project}/>
+                            <ProjectForm handleSubmit={editProject} btnText="Concluir Edição" projectData={project}/>
                         </div>
                     )}
                 </div>
@@ -210,7 +209,9 @@ function Project() {
     ) : (
         <Loading/>
     )}
-    </>)
+        </>
+        )
 }
 
 export default Project
+
