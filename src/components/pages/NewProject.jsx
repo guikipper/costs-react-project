@@ -11,8 +11,8 @@ function NewProject() {
         console.log(project)
         if(project.name && project.budget && project.category) {
                 //initialize cost and services
-            project.cost = 0; //nao entendi
-            project.services = [] //nao entendi
+            project.cost = 0; 
+            project.services = [] 
 
             fetch("http://localhost:4000/projects", 
                 { 

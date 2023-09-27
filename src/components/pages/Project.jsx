@@ -67,15 +67,21 @@ function Project() {
         })
     }
 
+    //ao criar um serviço o valor do ultimo serviço do array, dentro de project>services, é armazenado na variavel lastService
+    //é atribuído um id para esse lastService
+    //é criada uma variável lastServiceCost, que recebe o custo do ultimo serviço
+    //então é somado o novo custo, que é a soma do custo do projeto com o custo do ultimo serviço, lembrando que o ultimo serviço vem do ultimo array
+
     function createService(project) {
         setMessage('')
         const lastService = project.services[project.services.length -1]
         lastService.id = uuid()
         const lastServiceCost = parseFloat(lastService.cost) //certo
         const newCost = parseFloat(project.cost) + lastServiceCost
+
         const projectBudget = parseFloat(project.budget)
 
-        //maximum value validation
+        //validação de custo X orçamento
         if (newCost > projectBudget) {
             console.log('estourou')
             setMessage('Orçamento ultrapassado, verifique o valor do serviço.')
@@ -86,10 +92,9 @@ function Project() {
 
         //add service cost to project total cost
         project.cost = newCost
-
         // update project
 
-        fetch(`http://localhost:4000/projects/${project.id}`,{
+        fetch(`http://localhost:4000/projects/${project._id}`,{
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'
@@ -105,22 +110,90 @@ function Project() {
         })
     }
 
+    //EDITAR SERVIÇO
+
+    function editService(data, id) {
+        const budget = data.budget
+        const lastService = data.services[data.services.length -1] //pegando ultimo services, que é o que foi enviado para atualizar
+
+        console.log('CUSTO DO ULTIMO SERVIÇO: ',lastService.cost)
+        console.log('Orçamento total do projeto: ',budget)
+
+        //map
+        const newArray = data.services.map((elemento)=>{ //percorrendo o array e substituindo os valores
+            if (elemento.id == id) {
+                elemento.name = lastService.name
+                elemento.cost = lastService.cost
+                elemento.description = lastService.description
+            } 
+            return elemento
+        })
+
+        //filter
+        const finalArray = newArray.filter((e)=>{ //removendo o ultimo objeto, que não possui ID
+            return 'id' in e; // Verifica se a propriedade 'id' está presente no objeto
+        })
+
+        //atribuindo o novo array de services ao array data, que é o que será enviado pela API
+        data.services = finalArray
+        console.log('Data.cost: ',data.cost)
+        console.log('LastService.cost: ',lastService.cost)
+        let soma = 0 
+        finalArray.forEach((e)=>{
+            soma += parseFloat(e.cost);
+        })
+        //console.log('sominha: ',soma);
+        data.cost = soma
+
+        if (soma > budget) {
+            alert('Orçamento estourado!')
+        } else {
+            fetch(`http://localhost:4000/projects/${data._id}`,{
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then((res)=>res.json())
+            .then((data2)=>{
+                //setShowServiceForm(false)
+                setProject(data)
+                setServices(finalArray)
+                console.log('DEU CERTO EU ACHO')
+            })
+            .catch((err)=>{
+                console.log('Error: ',err)
+            }) 
+        }
+
+         
+    }
+    //EDITAR SERVIÇO
+    
+
     function toggleProjectForm() { //função para exibir ou não a edição do projeto
         setShowProjectForm(!showProjectForm)
     }
     function toggleServiceForm() {
         setShowServiceForm(!showServiceForm)
     }
+
+
     function removeService(id, cost) {
+        //o id é passado para ser excluído com o filter, mantendo todos os outros services, se houver
         //atualizar o serviço
         const serviceUpdate = project.services.filter(
             (service) => service.id !== id
             )
+        //serviceUpdated agora não tem o service que foi passado por id
         const projectUpdated = project
+        //projectUpdated recebe project, e a sua parte de services recebe o serviceUpdated, tratado acima
         projectUpdated.services = serviceUpdate
+        //e o custo final do projeto é o resultado do próprio custo do projeto menos o custo que veio por parâmetro
         projectUpdated.cost = parseFloat(projectUpdated.cost) - parseFloat(cost)
 
-        fetch(`http://localhost:5000/projects/${projectUpdated.id}`,{
+        fetch(`http://localhost:4000/projects/${projectUpdated._id}`,{
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'
@@ -129,6 +202,7 @@ function Project() {
         })
         .then((res)=>res.json())
         .then((data)=>{
+            //e aqui que se atualiza o project e o service, pois a requisição já foi um sucesso
             setProject(projectUpdated)
             setServices(serviceUpdate)
             setMessage('Serviço removido com sucesso!')
@@ -183,6 +257,10 @@ function Project() {
                             btnText="Adicionar Serviço"
                             projectData={project}
                             />
+                            //O componente ServiceForm passa 3 props
+                            //1- a função de submit
+                            //2- o texto do botão
+                            //3 - os dados do projeto
                         )}
                     </div>
                 </div>
@@ -190,6 +268,7 @@ function Project() {
                     <Container customClass="start">
                         {services.length > 0 && (
                             services.map((service)=>(
+                                
                                 <ServiceCard
                                     id={service.id}
                                     name={service.name}
@@ -197,6 +276,8 @@ function Project() {
                                     description={service.description}
                                     key={service.id}
                                     handleRemove={removeService}
+                                    projectData={project} //VEREMOS SE FUNCIONARÁ
+                                    handleEdit={editService}
                                 />
                             ))
                         )}

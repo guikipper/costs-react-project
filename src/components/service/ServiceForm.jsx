@@ -9,13 +9,18 @@ function ServiceForm({handleSubmit, btnText, projectData}) {
 
     function submit(e) {
         e.preventDefault()
-        projectData.services.push(service)
-        handleSubmit(projectData) //função que vem de Project
+        if(service.name && service.cost && service.description) {
+            projectData.services.push(service)
+            //recebo o project e os dados de service, dou um push em projectData e passo esse valor para handleSubmit, que equivale a função createService, lá em Project
+            //dessa forma, o parâmetro que createService recebe é o projectData com o serviço adicionado
+            handleSubmit(projectData) //função que vem de Project
+        } else {
+            console.log('tem que informar os dados o djow')
+        }
     }
 
     function handleChange(e) {
         setService({...service, [e.target.name]: e.target.value})
-        console.log('testando: ',e.target.name)
     }
 
     return (

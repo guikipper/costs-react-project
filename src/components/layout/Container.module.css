@@ -8,11 +8,10 @@
 .minHeight {
     min-height: 70%;
 }
-
 .start {
     justify-content: flex-start;
+    overflow-x: auto;
 }
-
 .column {
     flex-direction: column;
     justify-content: flex-start;
